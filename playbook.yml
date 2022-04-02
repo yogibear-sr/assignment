@@ -1,0 +1,30 @@
+---
+- name: This sets up an httpd webserver
+  hosts: all
+  tasks:
+  - name: Install apache packages
+    yum:
+      name: httpd
+      state: present
+    become: true
+    become_user: root
+  - name: port
+    ansible.builtin.shell: sed -i 's/Listen 80/Listen 8080/' /etc/httpd/conf/httpd.conf
+    become: true
+    become_user: root
+  - name: ensure httpd is running
+    service:
+      name: httpd
+      state: started
+    become: true
+    become_user: root
+  - name: enable startup from reboot
+    ansible.builtin.shell: systemctl enable httpd.service
+    become: true
+    become_user: root
+# - name: shutdown
+#    command: /sbin/shutdown -h now
+#    become: true
+#    become_user: root
+#  - name: wait go down
+#    local_action: wait_for host={{ inventory_hostname }} port=22 state=stopped
